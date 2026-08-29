@@ -28,8 +28,18 @@ Build a production-ready static landing page (pure HTML5/CSS3/Vanilla JS, no fra
 - IntersectionObserver scroll reveals with sibling stagger; prefers-reduced-motion supported
 - Fully responsive (1024px, 768px, 520px breakpoints)
 
+## Implemented (June 2026) — v2 Single-File Merge
+- Merged into ONE self-contained file: /app/frontend/public/index.html (CSS in <style> in head, JS in <script> before </body>); styles.css and main.js deleted
+- Heavily commented for Shopify Liquid integration (section/snippet mapping notes)
+- NEW: Mobile off-canvas menu (left drawer, hamburger ≤768px, close btn, overlay, ESC)
+- NEW: Slide-out cart drawer (right): line items w/ variant + qty, remove, subtotal (en-IN), free shipping progress bar (₹1,999 threshold), checkout btn, rgba(0,0,0,0.5) overlay closes on click; opens on cart icon & add-to-cart
+- NEW: Variant swatches per card (Matte Black/Titanium/Cobalt) with active ring + label; selected variant flows into cart line item
+- NEW: Dual-image hover on card media (primary fades out, secondary fades in, pure CSS)
+- NEW: "Ships in 24h • COD Available" micro-text under each Add to Cart
+- NEW: Footer link columns as native <details>/<summary> accordions — locked open on desktop, collapsed/toggleable on mobile (matchMedia sync)
+
 ## Verified
-- Screenshot tests: hero reveal, add-to-cart (dot → 1, Added ✓), newsletter submit success, mobile 390px layout
+- v2 screenshot tests: swatch selection (Titanium label), hover image swap, cart drawer (2 items, ₹3,798 subtotal, free-ship unlocked), overlay close, mobile menu open/close, mobile accordions (0 open by default, toggle works)
 
 ## Backlog
 - P1: Real product images/names, working search overlay, cart drawer

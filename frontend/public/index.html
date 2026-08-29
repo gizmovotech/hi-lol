@@ -5,18 +5,1289 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Gizmovo — Curated, viral gadgets shipped directly to your door. Tech that just makes sense." />
   <title>Gizmovo — Tech That Just Makes Sense.</title>
+
+  <!-- ============================================================
+       Fonts
+       Shopify Liquid note: move these into theme.liquid <head>
+       ============================================================ -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+
+  <!-- ============================================================
+       Styles (inlined — Shopify Liquid: extract to assets/gizmovo.css
+       and load via {{ 'gizmovo.css' | asset_url | stylesheet_tag }})
+       ============================================================ -->
+  <style>
+    /* ============================================================
+       Gizmovo — Design System (CSS Variables)
+       ============================================================ */
+    :root {
+      /* Colors */
+      --gz-bg: #F8F9FA;
+      --gz-surface: #FFFFFF;
+      --gz-ink: #111111;
+      --gz-ink-soft: #55585e;
+      --gz-accent: #0047FF;
+      --gz-accent-ink: #FFFFFF;
+      --gz-line: rgba(17, 17, 17, 0.09);
+
+      /* Typography */
+      --gz-font-display: 'Archivo', sans-serif;
+      --gz-font-body: 'Instrument Sans', sans-serif;
+
+      /* Spacing scale */
+      --gz-space-1: 8px;
+      --gz-space-2: 16px;
+      --gz-space-3: 24px;
+      --gz-space-4: 40px;
+      --gz-space-5: 64px;
+      --gz-space-6: 104px;
+      --gz-space-7: 160px;
+
+      /* Radii & misc */
+      --gz-radius: 12px;
+      --gz-radius-pill: 999px;
+      --gz-max-width: 1280px;
+      --gz-header-h: 72px;
+      --gz-announce-h: 40px;
+      --gz-ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --gz-shadow-card: 0 24px 48px -20px rgba(17, 17, 17, 0.18);
+      --gz-drawer-w: 400px;
+      --gz-overlay: rgba(0, 0, 0, 0.5);
+      --gz-free-ship-threshold: 1999; /* informational; actual value lives in JS */
+    }
+
+    /* ============================================================
+       Reset & Base
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--gz-font-body);
+      background: var(--gz-bg);
+      color: var(--gz-ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Scroll lock when any drawer is open */
+    body.gizmovo-no-scroll { overflow: hidden; }
+
+    ::selection { background: var(--gz-accent); color: var(--gz-accent-ink); }
+
+    img, svg { display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ============================================================
+       Scroll Reveal Utility (driven by IntersectionObserver)
+       ============================================================ */
+    .gizmovo-observe {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.9s var(--gz-ease), transform 0.9s var(--gz-ease);
+      transition-delay: var(--gz-stagger, 0s);
+    }
+    .gizmovo-observe--visible { opacity: 1; transform: translateY(0); }
+
+    /* Masked line-by-line reveal (hero on-load moment) */
+    .gizmovo-reveal-line { display: block; overflow: hidden; }
+    .gizmovo-reveal-line__inner {
+      display: inline-block;
+      transform: translateY(115%);
+      transition: transform 1.1s var(--gz-ease);
+    }
+    body.gizmovo-loaded .gizmovo-reveal-line__inner { transform: translateY(0); }
+    .gizmovo-hero__eyebrow .gizmovo-reveal-line__inner { transition-delay: 0.1s; }
+    .gizmovo-hero__headline .gizmovo-reveal-line:nth-child(1) .gizmovo-reveal-line__inner { transition-delay: 0.22s; }
+    .gizmovo-hero__headline .gizmovo-reveal-line:nth-child(2) .gizmovo-reveal-line__inner { transition-delay: 0.34s; }
+    .gizmovo-hero__headline .gizmovo-reveal-line:nth-child(3) .gizmovo-reveal-line__inner { transition-delay: 0.46s; }
+    .gizmovo-hero__subhead .gizmovo-reveal-line__inner { transition-delay: 0.62s; }
+    .gizmovo-hero__cta-row .gizmovo-reveal-line__inner { transition-delay: 0.74s; }
+
+    /* ============================================================
+       Buttons
+       ============================================================ */
+    .gizmovo-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: var(--gz-font-display);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      border-radius: var(--gz-radius-pill);
+      overflow: hidden;
+      transition: transform 0.35s var(--gz-ease), box-shadow 0.35s var(--gz-ease), background-color 0.35s var(--gz-ease), color 0.35s var(--gz-ease);
+    }
+
+    /* Primary pill CTA (accent fill, dark sweep on hover) */
+    .gizmovo-btn--primary {
+      background: var(--gz-accent);
+      color: var(--gz-accent-ink);
+      padding: 18px 36px;
+    }
+    .gizmovo-btn--primary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--gz-ink);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.45s var(--gz-ease);
+      z-index: 0;
+    }
+    .gizmovo-btn--primary:hover::before { transform: scaleX(1); }
+    .gizmovo-btn--primary:hover { box-shadow: 0 16px 32px -12px rgba(0, 71, 255, 0.5); }
+    .gizmovo-btn--primary .gizmovo-btn__label,
+    .gizmovo-btn--primary .gizmovo-btn__arrow { position: relative; z-index: 1; }
+    .gizmovo-btn__arrow { transition: transform 0.35s var(--gz-ease); }
+    .gizmovo-btn--primary:hover .gizmovo-btn__arrow { transform: translateX(5px); }
+    .gizmovo-btn--primary:active { transform: scale(0.97); }
+
+    /* Full-width card "Add to Cart" button */
+    .gizmovo-btn--cart {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--gz-ink);
+      color: #fff;
+      border-radius: var(--gz-radius);
+      font-size: 14px;
+    }
+    .gizmovo-btn--cart .gizmovo-btn__label { transition: transform 0.35s var(--gz-ease), opacity 0.35s var(--gz-ease); }
+    .gizmovo-btn--cart .gizmovo-btn__label--added {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    .gizmovo-btn--cart:hover { background: var(--gz-accent); }
+    .gizmovo-btn--cart:active { transform: scale(0.96); }
+    .gizmovo-btn--cart.gizmovo-btn--clicked { background: var(--gz-accent); }
+    .gizmovo-btn--cart.gizmovo-btn--clicked .gizmovo-btn__label:not(.gizmovo-btn__label--added) { opacity: 0; transform: translateY(-100%); }
+    .gizmovo-btn--cart.gizmovo-btn--clicked .gizmovo-btn__label--added { opacity: 1; transform: translateY(0); }
+
+    /* ============================================================
+       Announcement Bar (sticky, infinite marquee)
+       ============================================================ */
+    .gizmovo-announcement {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      height: var(--gz-announce-h);
+      background: var(--gz-ink);
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .gizmovo-announcement__track {
+      display: flex;
+      width: max-content;
+      animation: gz-marquee 22s linear infinite;
+    }
+    .gizmovo-announcement:hover .gizmovo-announcement__track { animation-play-state: paused; }
+    .gizmovo-announcement__group {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding-right: 32px;
+    }
+    .gizmovo-announcement__item {
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .gizmovo-announcement__dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gz-accent);
+      flex-shrink: 0;
+    }
+
+    @keyframes gz-marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ============================================================
+       Header / Navigation
+       ============================================================ */
+    .gizmovo-header {
+      position: sticky;
+      top: var(--gz-announce-h);
+      z-index: 50;
+      background: rgba(248, 249, 250, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--gz-line);
+      transition: box-shadow 0.4s var(--gz-ease);
+    }
+    .gizmovo-header--scrolled { box-shadow: 0 8px 30px -18px rgba(17, 17, 17, 0.25); }
+    .gizmovo-header__inner {
+      max-width: var(--gz-max-width);
+      margin: 0 auto;
+      height: var(--gz-header-h);
+      padding: 0 var(--gz-space-3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--gz-space-3);
+    }
+    .gizmovo-header__logo {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-size: 26px;
+      letter-spacing: -0.04em;
+      font-stretch: 110%;
+    }
+    .gizmovo-header__logo-dot { color: var(--gz-accent); }
+    .gizmovo-header__nav { display: flex; gap: var(--gz-space-4); }
+    .gizmovo-header__link {
+      position: relative;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 6px 0;
+      transition: color 0.3s var(--gz-ease);
+    }
+    .gizmovo-header__link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--gz-accent);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.35s var(--gz-ease);
+    }
+    .gizmovo-header__link:hover { color: var(--gz-accent); }
+    .gizmovo-header__link:hover::after { transform: scaleX(1); transform-origin: left; }
+    .gizmovo-header__actions { display: flex; gap: var(--gz-space-1); align-items: center; }
+    .gizmovo-header__icon-btn {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--gz-radius-pill);
+      color: var(--gz-ink);
+      transition: background-color 0.3s var(--gz-ease), transform 0.3s var(--gz-ease);
+    }
+    .gizmovo-header__icon-btn:hover { background: rgba(17, 17, 17, 0.06); transform: translateY(-2px); }
+    .gizmovo-header__cart-dot {
+      position: absolute;
+      top: 2px;
+      right: 0;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 4px;
+      background: var(--gz-accent);
+      color: #fff;
+      border-radius: var(--gz-radius-pill);
+      font-size: 10.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0);
+      transition: transform 0.3s var(--gz-ease);
+    }
+    .gizmovo-header__cart-dot--visible { transform: scale(1); }
+    .gizmovo-header__cart-dot--pop { animation: gz-cart-pop 0.55s var(--gz-ease); }
+
+    @keyframes gz-cart-pop {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.7); }
+      60% { transform: scale(0.85); }
+      100% { transform: scale(1); }
+    }
+
+    /* Hamburger button — mobile only */
+    .gizmovo-header__hamburger { display: none; }
+
+    /* ============================================================
+       Mobile Off-Canvas Menu (slides in from the LEFT)
+       ============================================================ */
+    .gizmovo-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100dvh;
+      width: min(var(--gz-drawer-w), 86vw);
+      background: var(--gz-surface);
+      z-index: 90;
+      transform: translateX(-105%);
+      transition: transform 0.5s var(--gz-ease);
+      display: flex;
+      flex-direction: column;
+      padding: var(--gz-space-3);
+      box-shadow: 24px 0 60px -30px rgba(17, 17, 17, 0.3);
+    }
+    .gizmovo-menu--open { transform: translateX(0); }
+    .gizmovo-menu__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--gz-space-3);
+      border-bottom: 1px solid var(--gz-line);
+    }
+    .gizmovo-menu__logo {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+      font-stretch: 110%;
+    }
+    .gizmovo-menu__logo-dot { color: var(--gz-accent); }
+    .gizmovo-menu__close {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--gz-radius-pill);
+      color: var(--gz-ink);
+      transition: background-color 0.3s var(--gz-ease), transform 0.3s var(--gz-ease);
+    }
+    .gizmovo-menu__close:hover { background: rgba(17, 17, 17, 0.06); transform: rotate(90deg); }
+    .gizmovo-menu__nav { display: flex; flex-direction: column; padding-top: var(--gz-space-3); }
+    .gizmovo-menu__link {
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-stretch: 110%;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      padding: var(--gz-space-2) 0;
+      border-bottom: 1px solid var(--gz-line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: color 0.3s var(--gz-ease), padding-left 0.3s var(--gz-ease);
+    }
+    .gizmovo-menu__link:hover { color: var(--gz-accent); padding-left: 8px; }
+    .gizmovo-menu__link-arrow { font-size: 20px; color: var(--gz-accent); }
+    .gizmovo-menu__foot {
+      margin-top: auto;
+      font-size: 13px;
+      color: var(--gz-ink-soft);
+      line-height: 1.8;
+    }
+
+    /* ============================================================
+       Slide-Out Cart Drawer (slides in from the RIGHT)
+       Shopify Liquid note: hook line items to cart.items loop
+       ============================================================ */
+    .gizmovo-cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100dvh;
+      width: min(var(--gz-drawer-w), 92vw);
+      background: var(--gz-surface);
+      z-index: 90;
+      transform: translateX(105%);
+      transition: transform 0.5s var(--gz-ease);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -24px 0 60px -30px rgba(17, 17, 17, 0.3);
+    }
+    .gizmovo-cart-drawer--open { transform: translateX(0); }
+    .gizmovo-cart-drawer__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--gz-space-3);
+      border-bottom: 1px solid var(--gz-line);
+    }
+    .gizmovo-cart-drawer__title {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 110%;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .gizmovo-cart-drawer__count { color: var(--gz-accent); }
+    .gizmovo-cart-drawer__close {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--gz-radius-pill);
+      color: var(--gz-ink);
+      transition: background-color 0.3s var(--gz-ease), transform 0.3s var(--gz-ease);
+    }
+    .gizmovo-cart-drawer__close:hover { background: rgba(17, 17, 17, 0.06); transform: rotate(90deg); }
+
+    /* Free shipping progress bar */
+    .gizmovo-cart-drawer__shipping { padding: var(--gz-space-2) var(--gz-space-3); border-bottom: 1px solid var(--gz-line); }
+    .gizmovo-cart-drawer__shipping-text { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+    .gizmovo-cart-drawer__shipping-text strong { color: var(--gz-accent); }
+    .gizmovo-cart-drawer__progress {
+      height: 6px;
+      background: var(--gz-bg);
+      border: 1px solid var(--gz-line);
+      border-radius: var(--gz-radius-pill);
+      overflow: hidden;
+    }
+    .gizmovo-cart-drawer__progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--gz-accent);
+      border-radius: var(--gz-radius-pill);
+      transition: width 0.6s var(--gz-ease);
+    }
+
+    /* Cart items list */
+    .gizmovo-cart-drawer__items {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--gz-space-2) var(--gz-space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--gz-space-2);
+    }
+    .gizmovo-cart-drawer__empty {
+      text-align: center;
+      color: var(--gz-ink-soft);
+      font-size: 14.5px;
+      padding: var(--gz-space-5) var(--gz-space-2);
+    }
+    .gizmovo-cart-item {
+      display: flex;
+      gap: var(--gz-space-2);
+      align-items: center;
+      background: var(--gz-bg);
+      border: 1px solid var(--gz-line);
+      border-radius: var(--gz-radius);
+      padding: var(--gz-space-2);
+      animation: gz-cart-item-in 0.45s var(--gz-ease);
+    }
+    @keyframes gz-cart-item-in {
+      from { opacity: 0; transform: translateX(24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .gizmovo-cart-item__thumb {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: linear-gradient(160deg, #eef0f3, #f7f8fa);
+      border: 1px solid var(--gz-line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--gz-ink-soft);
+    }
+    .gizmovo-cart-item__info { flex: 1; min-width: 0; }
+    .gizmovo-cart-item__name {
+      font-family: var(--gz-font-display);
+      font-weight: 700;
+      font-size: 13.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gizmovo-cart-item__meta { font-size: 12.5px; color: var(--gz-ink-soft); }
+    .gizmovo-cart-item__price {
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: 14.5px;
+      color: var(--gz-accent);
+      white-space: nowrap;
+    }
+    .gizmovo-cart-item__remove {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--gz-radius-pill);
+      color: var(--gz-ink-soft);
+      font-size: 16px;
+      transition: background-color 0.3s var(--gz-ease), color 0.3s var(--gz-ease);
+    }
+    .gizmovo-cart-item__remove:hover { background: rgba(17, 17, 17, 0.07); color: var(--gz-ink); }
+
+    /* Cart footer: subtotal + checkout */
+    .gizmovo-cart-drawer__foot {
+      padding: var(--gz-space-3);
+      border-top: 1px solid var(--gz-line);
+      background: var(--gz-surface);
+    }
+    .gizmovo-cart-drawer__subtotal {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: var(--gz-space-2);
+    }
+    .gizmovo-cart-drawer__subtotal-label { font-size: 14px; font-weight: 600; color: var(--gz-ink-soft); }
+    .gizmovo-cart-drawer__subtotal-value {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+    .gizmovo-cart-drawer__checkout { width: 100%; }
+    .gizmovo-cart-drawer__note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--gz-ink-soft);
+      margin-top: var(--gz-space-1);
+    }
+
+    /* ============================================================
+       Shared Overlay (behind menu & cart drawers)
+       ============================================================ */
+    .gizmovo-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s var(--gz-ease);
+    }
+    .gizmovo-overlay--visible { opacity: 1; pointer-events: auto; }
+
+    /* ============================================================
+       Hero Section
+       ============================================================ */
+    .gizmovo-hero {
+      position: relative;
+      min-height: calc(100vh - var(--gz-header-h) - var(--gz-announce-h));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--gz-space-6) 0 var(--gz-space-5);
+      overflow: hidden;
+    }
+    .gizmovo-hero__grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--gz-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gz-line) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 90% 70% at 60% 40%, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 70% at 60% 40%, black 30%, transparent 75%);
+      pointer-events: none;
+    }
+    .gizmovo-hero__inner {
+      position: relative;
+      max-width: var(--gz-max-width);
+      margin: 0 auto;
+      padding: 0 var(--gz-space-3);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: var(--gz-space-5);
+      align-items: center;
+      width: 100%;
+    }
+    .gizmovo-hero__eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gz-accent);
+      margin-bottom: var(--gz-space-3);
+    }
+    .gizmovo-hero__headline {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: clamp(2.6rem, 6vw, 5.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+      margin-bottom: var(--gz-space-4);
+    }
+    .gizmovo-hero__headline .gizmovo-reveal-line__inner { white-space: nowrap; }
+    .gizmovo-reveal-line--accent .gizmovo-reveal-line__inner { color: var(--gz-accent); }
+    .gizmovo-hero__period { color: var(--gz-ink); }
+    .gizmovo-hero__subhead {
+      font-size: clamp(1rem, 1.6vw, 1.25rem);
+      color: var(--gz-ink-soft);
+      max-width: 420px;
+      margin-bottom: var(--gz-space-4);
+    }
+    .gizmovo-hero__cta-row .gizmovo-reveal-line__inner {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--gz-space-3);
+      flex-wrap: wrap;
+    }
+    .gizmovo-hero__cta-note { font-size: 13px; color: var(--gz-ink-soft); font-weight: 500; }
+
+    /* Hero visual — placeholder frame with floating chips + parallax */
+    .gizmovo-hero__visual {
+      position: relative;
+      opacity: 0;
+      transform: translateY(40px) rotate(2deg);
+      transition: opacity 1.2s var(--gz-ease) 0.5s, transform 1.2s var(--gz-ease) 0.5s;
+      will-change: transform;
+    }
+    body.gizmovo-loaded .gizmovo-hero__visual { opacity: 1; transform: translateY(0) rotate(0deg); }
+    .gizmovo-hero__frame {
+      aspect-ratio: 1 / 1;
+      background: var(--gz-surface);
+      border: 1px solid var(--gz-line);
+      border-radius: calc(var(--gz-radius) * 2);
+      box-shadow: var(--gz-shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gz-space-2);
+      position: relative;
+      overflow: hidden;
+    }
+    .gizmovo-hero__frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(0, 71, 255, 0.08), transparent 65%);
+    }
+    .gizmovo-hero__frame-tag {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      color: var(--gz-accent);
+      border: 1.5px solid var(--gz-accent);
+      border-radius: var(--gz-radius-pill);
+      padding: 4px 12px;
+    }
+    .gizmovo-hero__frame-label {
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: clamp(14px, 1.6vw, 19px);
+      letter-spacing: 0.06em;
+      color: var(--gz-ink);
+    }
+    .gizmovo-hero__frame-meta { font-size: 12px; color: var(--gz-ink-soft); letter-spacing: 0.04em; }
+    .gizmovo-hero__chip {
+      position: absolute;
+      background: var(--gz-surface);
+      border: 1px solid var(--gz-line);
+      border-radius: var(--gz-radius-pill);
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 14px 30px -14px rgba(17, 17, 17, 0.25);
+      animation: gz-float 5s ease-in-out infinite;
+    }
+    .gizmovo-hero__chip--one { top: 8%; right: -4%; }
+    .gizmovo-hero__chip--two { bottom: 10%; left: -6%; animation-delay: -2.5s; }
+
+    @keyframes gz-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .gizmovo-hero__scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gz-ink-soft);
+    }
+    .gizmovo-hero__scroll-line {
+      width: 1.5px;
+      height: 36px;
+      background: var(--gz-ink);
+      transform-origin: top;
+      animation: gz-scroll-line 1.8s var(--gz-ease) infinite;
+    }
+
+    @keyframes gz-scroll-line {
+      0% { transform: scaleY(0); transform-origin: top; }
+      45% { transform: scaleY(1); transform-origin: top; }
+      55% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ============================================================
+       Trust Bar
+       ============================================================ */
+    .gizmovo-trust {
+      background: var(--gz-surface);
+      border-top: 1px solid var(--gz-line);
+      border-bottom: 1px solid var(--gz-line);
+    }
+    .gizmovo-trust__inner {
+      max-width: var(--gz-max-width);
+      margin: 0 auto;
+      padding: var(--gz-space-4) var(--gz-space-3);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--gz-space-3);
+    }
+    .gizmovo-trust__item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gz-space-2);
+    }
+    .gizmovo-trust__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--gz-radius);
+      background: var(--gz-bg);
+      color: var(--gz-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .gizmovo-trust__text {
+      font-family: var(--gz-font-display);
+      font-weight: 700;
+      font-size: 14.5px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ============================================================
+       Manifesto (numbered chapters)
+       ============================================================ */
+    .gizmovo-manifesto { padding: var(--gz-space-7) 0; }
+    .gizmovo-manifesto__inner {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 var(--gz-space-3);
+    }
+    .gizmovo-manifesto__kicker {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gz-accent);
+      margin-bottom: var(--gz-space-5);
+    }
+    .gizmovo-manifesto__chapter {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: var(--gz-space-4);
+      padding: var(--gz-space-5) 0;
+      border-top: 1px solid var(--gz-line);
+    }
+    .gizmovo-manifesto__num {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: clamp(2.6rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--gz-accent);
+    }
+    .gizmovo-manifesto__title {
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-stretch: 110%;
+      font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: var(--gz-space-2);
+    }
+    .gizmovo-manifesto__text { color: var(--gz-ink-soft); max-width: 520px; font-size: 16px; }
+
+    /* ============================================================
+       Editorial Marquee (slow, oversized)
+       ============================================================ */
+    .gizmovo-marquee {
+      overflow: hidden;
+      padding: var(--gz-space-4) 0;
+      background: var(--gz-ink);
+    }
+    .gizmovo-marquee__track {
+      display: flex;
+      width: max-content;
+      animation: gz-marquee 40s linear infinite;
+    }
+    .gizmovo-marquee__group {
+      display: flex;
+      align-items: center;
+      gap: var(--gz-space-4);
+      padding-right: var(--gz-space-4);
+    }
+    .gizmovo-marquee__word {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .gizmovo-marquee__word--outline {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.55);
+    }
+    .gizmovo-marquee__star { color: var(--gz-accent); font-size: clamp(1.6rem, 3vw, 2.4rem); }
+
+    /* ============================================================
+       Trending Drops — Product Grid
+       ============================================================ */
+    .gizmovo-products { padding: var(--gz-space-7) 0; }
+    .gizmovo-products__inner {
+      max-width: var(--gz-max-width);
+      margin: 0 auto;
+      padding: 0 var(--gz-space-3);
+    }
+    .gizmovo-products__head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--gz-space-4);
+      margin-bottom: var(--gz-space-5);
+    }
+    .gizmovo-products__title {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: clamp(2.6rem, 6vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+    }
+    .gizmovo-products__title-dot { color: var(--gz-accent); }
+    .gizmovo-products__sub { color: var(--gz-ink-soft); max-width: 320px; font-size: 15px; }
+
+    .gizmovo-products__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--gz-space-3);
+    }
+
+    /* Product Card */
+    .gizmovo-product-card {
+      background: var(--gz-surface);
+      border: 1px solid var(--gz-line);
+      border-radius: var(--gz-radius);
+      overflow: hidden;
+      transition: transform 0.45s var(--gz-ease), box-shadow 0.45s var(--gz-ease);
+    }
+    .gizmovo-product-card:hover {
+      transform: scale(1.03);
+      box-shadow: var(--gz-shadow-card);
+    }
+    .gizmovo-product-card__media {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(160deg, #eef0f3, #f7f8fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Dual image layers — primary fades out, secondary fades in on hover
+       Shopify Liquid note: swap for product.featured_image / product.images[1] */
+    .gizmovo-product-card__img {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s var(--gz-ease), transform 0.6s var(--gz-ease);
+    }
+    .gizmovo-product-card__img--primary {
+      background: linear-gradient(160deg, #eef0f3, #f7f8fa);
+      opacity: 1;
+      z-index: 1;
+    }
+    .gizmovo-product-card__img--secondary {
+      background: linear-gradient(200deg, #e6ebff, #f2f5ff);
+      opacity: 0;
+      transform: scale(1.06);
+    }
+    .gizmovo-product-card__media:hover .gizmovo-product-card__img--primary { opacity: 0; }
+    .gizmovo-product-card__media:hover .gizmovo-product-card__img--secondary { opacity: 1; transform: scale(1); }
+
+    .gizmovo-product-card__badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 2;
+      background: var(--gz-accent);
+      color: #fff;
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: var(--gz-radius-pill);
+    }
+    .gizmovo-product-card__badge--alt { background: var(--gz-ink); }
+    .gizmovo-product-card__placeholder {
+      font-family: var(--gz-font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--gz-ink-soft);
+    }
+    .gizmovo-product-card__index {
+      position: absolute;
+      bottom: -14px;
+      right: 6px;
+      z-index: 2;
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: 84px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(17, 17, 17, 0.12);
+      transition: -webkit-text-stroke-color 0.45s var(--gz-ease), transform 0.45s var(--gz-ease);
+    }
+    .gizmovo-product-card:hover .gizmovo-product-card__index {
+      -webkit-text-stroke-color: var(--gz-accent);
+      transform: translateY(-6px);
+    }
+    .gizmovo-product-card__info { padding: var(--gz-space-3); }
+    .gizmovo-product-card__title {
+      font-family: var(--gz-font-display);
+      font-weight: 700;
+      font-size: 15.5px;
+      letter-spacing: 0.01em;
+      margin-bottom: var(--gz-space-1);
+    }
+    .gizmovo-product-card__pricing {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: var(--gz-space-2);
+    }
+    .gizmovo-product-card__price-old { color: var(--gz-ink-soft); font-size: 14px; }
+    .gizmovo-product-card__price {
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: 19px;
+      color: var(--gz-accent);
+    }
+
+    /* Variant swatches — Shopify Liquid note: loop product.options_with_values */
+    .gizmovo-swatches {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: var(--gz-space-2);
+    }
+    .gizmovo-swatches__label { font-size: 12px; color: var(--gz-ink-soft); font-weight: 500; }
+    .gizmovo-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      outline: 1px solid var(--gz-line);
+      outline-offset: 2px;
+      transition: outline-color 0.3s var(--gz-ease), transform 0.3s var(--gz-ease);
+      flex-shrink: 0;
+    }
+    .gizmovo-swatch:hover { transform: scale(1.15); }
+    .gizmovo-swatch--active { outline: 2px solid var(--gz-accent); outline-offset: 2px; }
+    .gizmovo-swatch--black { background: #1a1a1a; }
+    .gizmovo-swatch--titanium { background: linear-gradient(145deg, #c9cad1, #9b9ca3); }
+    .gizmovo-swatch--cobalt { background: var(--gz-accent); }
+
+    /* Trust micro-text under Add to Cart */
+    .gizmovo-product-card__trust {
+      margin-top: var(--gz-space-1);
+      font-size: 11.5px;
+      letter-spacing: 0.03em;
+      color: var(--gz-ink-soft);
+      text-align: center;
+    }
+
+    /* ============================================================
+       Social Proof / UGC Section
+       ============================================================ */
+    .gizmovo-ugc {
+      background: var(--gz-surface);
+      border-top: 1px solid var(--gz-line);
+      padding: var(--gz-space-7) 0;
+    }
+    .gizmovo-ugc__inner { max-width: var(--gz-max-width); margin: 0 auto; }
+    .gizmovo-ugc__head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--gz-space-4);
+      padding: 0 var(--gz-space-3);
+      margin-bottom: var(--gz-space-5);
+    }
+    .gizmovo-ugc__title {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: clamp(2.6rem, 6vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+    }
+    .gizmovo-ugc__title-dot { color: var(--gz-accent); }
+    .gizmovo-ugc__sub { color: var(--gz-ink-soft); max-width: 300px; font-size: 15px; }
+    .gizmovo-ugc__row {
+      display: flex;
+      gap: var(--gz-space-3);
+      overflow-x: auto;
+      padding: var(--gz-space-1) var(--gz-space-3) var(--gz-space-3);
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .gizmovo-ugc__row::-webkit-scrollbar { display: none; }
+
+    /* Review Card */
+    .gizmovo-review-card {
+      flex: 0 0 320px;
+      scroll-snap-align: start;
+      background: var(--gz-bg);
+      border: 1px solid var(--gz-line);
+      border-radius: var(--gz-radius);
+      padding: var(--gz-space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--gz-space-2);
+      transition: transform 0.4s var(--gz-ease), box-shadow 0.4s var(--gz-ease), border-color 0.4s var(--gz-ease);
+    }
+    .gizmovo-review-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--gz-shadow-card);
+      border-color: rgba(0, 71, 255, 0.35);
+    }
+    .gizmovo-review-card__stars { color: var(--gz-accent); letter-spacing: 4px; font-size: 15px; }
+    .gizmovo-review-card__quote {
+      font-family: var(--gz-font-display);
+      font-weight: 700;
+      font-size: 16.5px;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+    .gizmovo-review-card__user { font-size: 13.5px; color: var(--gz-ink-soft); font-weight: 500; margin-top: auto; }
+
+    /* ============================================================
+       Footer
+       ============================================================ */
+    .gizmovo-footer { background: var(--gz-ink); color: #fff; padding: var(--gz-space-6) 0 var(--gz-space-4); }
+    .gizmovo-footer__inner {
+      max-width: var(--gz-max-width);
+      margin: 0 auto;
+      padding: 0 var(--gz-space-3);
+    }
+    .gizmovo-footer__newsletter { margin-bottom: var(--gz-space-6); }
+    .gizmovo-footer__headline {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-stretch: 115%;
+      font-size: clamp(2.6rem, 7vw, 5.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+      margin-bottom: var(--gz-space-2);
+    }
+    .gizmovo-footer__headline-dot { color: var(--gz-accent); }
+    .gizmovo-footer__sub { color: rgba(255, 255, 255, 0.6); margin-bottom: var(--gz-space-4); font-size: 16px; }
+
+    /* Newsletter form */
+    .gizmovo-newsletter {
+      display: flex;
+      gap: var(--gz-space-2);
+      max-width: 520px;
+      flex-wrap: wrap;
+    }
+    .gizmovo-newsletter__input {
+      flex: 1 1 260px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--gz-radius-pill);
+      padding: 16px 26px;
+      font-family: var(--gz-font-body);
+      font-size: 15px;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.3s var(--gz-ease), background-color 0.3s var(--gz-ease);
+    }
+    .gizmovo-newsletter__input::placeholder { color: rgba(255, 255, 255, 0.4); }
+    .gizmovo-newsletter__input:focus { border-color: var(--gz-accent); background: rgba(255, 255, 255, 0.1); }
+    .gizmovo-newsletter__submit { flex-shrink: 0; }
+    .gizmovo-newsletter__message {
+      margin-top: var(--gz-space-2);
+      font-size: 14px;
+      font-weight: 600;
+      color: #7da2ff;
+      min-height: 22px;
+    }
+    .gizmovo-newsletter__message--error { color: #ff7d7d; }
+
+    /* Footer link columns (accordion on mobile via <details>/<summary>) */
+    .gizmovo-footer__cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--gz-space-4);
+      padding-bottom: var(--gz-space-4);
+      margin-bottom: var(--gz-space-4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .gizmovo-footer-accordion__summary {
+      font-family: var(--gz-font-display);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.9);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--gz-space-2);
+    }
+    .gizmovo-footer-accordion__summary::-webkit-details-marker { display: none; }
+    .gizmovo-footer-accordion__chevron {
+      display: none;
+      transition: transform 0.35s var(--gz-ease);
+      color: var(--gz-accent);
+    }
+    .gizmovo-footer-accordion[open] .gizmovo-footer-accordion__chevron { transform: rotate(180deg); }
+    .gizmovo-footer-accordion__list { display: flex; flex-direction: column; gap: 10px; }
+    .gizmovo-footer__link {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.6);
+      transition: color 0.3s var(--gz-ease);
+    }
+    .gizmovo-footer__link:hover { color: var(--gz-accent); }
+
+    /* Footer bottom row */
+    .gizmovo-footer__bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--gz-space-3);
+      flex-wrap: wrap;
+    }
+    .gizmovo-footer__logo {
+      font-family: var(--gz-font-display);
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -0.04em;
+      font-stretch: 110%;
+    }
+    .gizmovo-footer__logo-dot { color: var(--gz-accent); }
+    .gizmovo-footer__payments { display: flex; gap: var(--gz-space-1); }
+    .gizmovo-footer__payment {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 5px 10px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+    .gizmovo-footer__copyright {
+      margin-top: var(--gz-space-4);
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ============================================================
+       Responsive — Tablet & Mobile (mobile-first adjustments)
+       ============================================================ */
+    @media (min-width: 769px) {
+      /* Desktop: footer accordions locked open, summaries not clickable */
+      .gizmovo-footer-accordion__summary { pointer-events: none; }
+    }
+
+    @media (max-width: 1024px) {
+      .gizmovo-products__grid { grid-template-columns: repeat(2, 1fr); }
+      .gizmovo-hero__inner { grid-template-columns: 1fr; gap: var(--gz-space-4); }
+      .gizmovo-hero__visual { max-width: 520px; }
+      .gizmovo-hero { min-height: 0; padding-top: var(--gz-space-5); }
+      .gizmovo-hero__scroll-hint { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .gizmovo-header__nav { display: none; }
+      .gizmovo-header__hamburger { display: flex; }
+      .gizmovo-trust__inner { grid-template-columns: 1fr; gap: var(--gz-space-2); }
+      .gizmovo-trust__item { justify-content: flex-start; }
+      .gizmovo-manifesto__chapter { grid-template-columns: 1fr; gap: var(--gz-space-2); }
+      .gizmovo-products__head,
+      .gizmovo-ugc__head { flex-direction: column; align-items: flex-start; gap: var(--gz-space-2); }
+      .gizmovo-manifesto,
+      .gizmovo-products,
+      .gizmovo-ugc { padding: var(--gz-space-6) 0; }
+      .gizmovo-hero__chip--one { right: 2%; }
+      .gizmovo-hero__chip--two { left: 2%; }
+
+      /* Footer columns collapse into stacked accordions */
+      .gizmovo-footer__cols { grid-template-columns: 1fr; gap: 0; }
+      .gizmovo-footer-accordion { border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+      .gizmovo-footer-accordion__summary { padding: var(--gz-space-2) 0; cursor: pointer; }
+      .gizmovo-footer-accordion__chevron { display: block; }
+      .gizmovo-footer-accordion__list { padding-bottom: var(--gz-space-2); }
+    }
+
+    @media (max-width: 520px) {
+      .gizmovo-products__grid { grid-template-columns: 1fr; }
+      .gizmovo-review-card { flex-basis: 280px; }
+      .gizmovo-footer__bottom { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
+    }
+  </style>
 </head>
 <body>
 
   <!-- ============================================================
        Sticky Announcement Bar (infinite CSS marquee)
+       Shopify Liquid: sections/announcement-bar.liquid
        ============================================================ -->
   <div class="gizmovo-announcement" data-testid="announcement-bar">
-    <div class="gizmovo-announcement__track" aria-hidden="false">
+    <div class="gizmovo-announcement__track">
       <div class="gizmovo-announcement__group">
         <span class="gizmovo-announcement__item">Free &amp; Fast Domestic Shipping Across India 🇮🇳</span>
         <span class="gizmovo-announcement__dot"></span>
@@ -42,9 +1313,16 @@
 
   <!-- ============================================================
        Header / Navigation
+       Shopify Liquid: sections/header.liquid — swap links for linklists
        ============================================================ -->
   <header class="gizmovo-header" id="gizmovo-header" data-testid="site-header">
     <div class="gizmovo-header__inner">
+
+      <!-- Hamburger (mobile only) — toggles off-canvas menu -->
+      <button class="gizmovo-header__icon-btn gizmovo-header__hamburger" id="gizmovo-menu-open" aria-label="Open menu" aria-controls="gizmovo-menu" aria-expanded="false" data-testid="hamburger-button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h12M3 18h18"/></svg>
+      </button>
+
       <a href="#" class="gizmovo-header__logo" data-testid="logo-link">Gizmovo<span class="gizmovo-header__logo-dot">.</span></a>
 
       <nav class="gizmovo-header__nav" aria-label="Primary">
@@ -57,7 +1335,8 @@
         <button class="gizmovo-header__icon-btn" aria-label="Search" data-testid="search-button">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
-        <button class="gizmovo-header__icon-btn gizmovo-header__icon-btn--cart" aria-label="Cart" id="gizmovo-cart-btn" data-testid="cart-button">
+        <!-- Cart icon — opens the slide-out cart drawer -->
+        <button class="gizmovo-header__icon-btn gizmovo-header__icon-btn--cart" aria-label="Open cart" id="gizmovo-cart-btn" data-testid="cart-button">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 8.5a2 2 0 0 1-2 1.5H8.7a2 2 0 0 1-2-1.6L5 3H2"/><circle cx="9" cy="21" r="1.6"/><circle cx="18" cy="21" r="1.6"/></svg>
           <span class="gizmovo-header__cart-dot" id="gizmovo-cart-dot" data-testid="cart-dot">0</span>
         </button>
@@ -65,10 +1344,78 @@
     </div>
   </header>
 
+  <!-- ============================================================
+       Mobile Off-Canvas Menu (slides from LEFT)
+       Shopify Liquid: render linklists.main-menu.links here
+       ============================================================ -->
+  <aside class="gizmovo-menu" id="gizmovo-menu" aria-label="Mobile menu" data-testid="mobile-menu">
+    <div class="gizmovo-menu__head">
+      <span class="gizmovo-menu__logo">Gizmovo<span class="gizmovo-menu__logo-dot">.</span></span>
+      <button class="gizmovo-menu__close" id="gizmovo-menu-close" aria-label="Close menu" data-testid="mobile-menu-close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <nav class="gizmovo-menu__nav" aria-label="Mobile primary">
+      <a href="#trending" class="gizmovo-menu__link" data-menu-link data-testid="mobile-nav-trending">Trending <span class="gizmovo-menu__link-arrow">→</span></a>
+      <a href="#manifesto" class="gizmovo-menu__link" data-menu-link data-testid="mobile-nav-essentials">Tech Essentials <span class="gizmovo-menu__link-arrow">→</span></a>
+      <a href="#footer" class="gizmovo-menu__link" data-menu-link data-testid="mobile-nav-track-order">Track Order <span class="gizmovo-menu__link-arrow">→</span></a>
+    </nav>
+    <div class="gizmovo-menu__foot">
+      Free &amp; fast domestic shipping 🇮🇳<br />
+      Cash on Delivery available
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       Slide-Out Cart Drawer (slides from RIGHT)
+       Shopify Liquid: snippets/cart-drawer.liquid — bind to cart object
+       ============================================================ -->
+  <aside class="gizmovo-cart-drawer" id="gizmovo-cart-drawer" aria-label="Shopping cart" data-testid="cart-drawer">
+    <!-- Cart header -->
+    <div class="gizmovo-cart-drawer__head">
+      <h2 class="gizmovo-cart-drawer__title">Your Cart <span class="gizmovo-cart-drawer__count" id="gizmovo-cart-drawer-count" data-testid="cart-drawer-count">(0)</span></h2>
+      <button class="gizmovo-cart-drawer__close" id="gizmovo-cart-close" aria-label="Close cart" data-testid="cart-drawer-close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <!-- Free shipping progress bar -->
+    <div class="gizmovo-cart-drawer__shipping">
+      <p class="gizmovo-cart-drawer__shipping-text" id="gizmovo-shipping-text" data-testid="shipping-progress-text">Add items to unlock <strong>Free Express Shipping</strong></p>
+      <div class="gizmovo-cart-drawer__progress">
+        <div class="gizmovo-cart-drawer__progress-fill" id="gizmovo-shipping-fill" data-testid="shipping-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Cart line items (rendered by JS; Liquid: {% for item in cart.items %}) -->
+    <div class="gizmovo-cart-drawer__items" id="gizmovo-cart-items" data-testid="cart-items">
+      <p class="gizmovo-cart-drawer__empty" data-testid="cart-empty-message">Your cart is empty.<br />Go grab the drop before it's gone. 👀</p>
+    </div>
+
+    <!-- Cart footer: subtotal + checkout -->
+    <div class="gizmovo-cart-drawer__foot">
+      <div class="gizmovo-cart-drawer__subtotal">
+        <span class="gizmovo-cart-drawer__subtotal-label">Subtotal</span>
+        <span class="gizmovo-cart-drawer__subtotal-value" id="gizmovo-cart-subtotal" data-testid="cart-subtotal">₹0</span>
+      </div>
+      <button class="gizmovo-btn gizmovo-btn--primary gizmovo-cart-drawer__checkout" data-testid="checkout-button">
+        <span class="gizmovo-btn__label">Checkout</span>
+        <span class="gizmovo-btn__arrow" aria-hidden="true">→</span>
+      </button>
+      <p class="gizmovo-cart-drawer__note">Taxes &amp; shipping calculated at checkout · COD available</p>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       Shared translucent overlay (closes menu / cart on click)
+       ============================================================ -->
+  <div class="gizmovo-overlay" id="gizmovo-overlay" data-testid="drawer-overlay"></div>
+
   <main class="gizmovo-main">
 
     <!-- ============================================================
          High-Impact Hero Section (kinetic masked-line reveal)
+         Shopify Liquid: sections/hero.liquid
          ============================================================ -->
     <section class="gizmovo-hero" id="hero" data-testid="hero-section">
       <div class="gizmovo-hero__grid-bg" aria-hidden="true"></div>
@@ -196,6 +1543,8 @@
 
     <!-- ============================================================
          "Trending Drops" Product Grid
+         Shopify Liquid: {% for product in collections.trending.products limit: 4 %}
+         data-name / data-price feed the JS cart — map to product.title / product.price
          ============================================================ -->
     <section class="gizmovo-products" id="trending" data-testid="products-section">
       <div class="gizmovo-products__inner">
@@ -209,8 +1558,14 @@
           <!-- Product Card 01 -->
           <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-1">
             <div class="gizmovo-product-card__media">
+              <!-- Dual image layers: primary fades out, secondary fades in on hover -->
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--primary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — FRONT]</span>
+              </div>
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--secondary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — ALT]</span>
+              </div>
               <span class="gizmovo-product-card__badge">TikTok Viral</span>
-              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
               <span class="gizmovo-product-card__index">01</span>
             </div>
             <div class="gizmovo-product-card__info">
@@ -219,18 +1574,32 @@
                 <s class="gizmovo-product-card__price-old">₹2,999</s>
                 <span class="gizmovo-product-card__price">₹1,499</span>
               </div>
-              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-1">
+              <!-- Variant swatches -->
+              <div class="gizmovo-swatches" data-testid="swatches-1">
+                <button class="gizmovo-swatch gizmovo-swatch--black gizmovo-swatch--active" data-swatch data-variant="Matte Black" aria-label="Matte Black" data-testid="swatch-1-black"></button>
+                <button class="gizmovo-swatch gizmovo-swatch--titanium" data-swatch data-variant="Titanium" aria-label="Titanium" data-testid="swatch-1-titanium"></button>
+                <button class="gizmovo-swatch gizmovo-swatch--cobalt" data-swatch data-variant="Cobalt" aria-label="Cobalt" data-testid="swatch-1-cobalt"></button>
+                <span class="gizmovo-swatches__label" data-swatch-label>Matte Black</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-name="[PRODUCT NAME] 01" data-price="1499" data-testid="add-to-cart-1">
                 <span class="gizmovo-btn__label">Add to Cart</span>
                 <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
               </button>
+              <!-- Trust micro-text -->
+              <p class="gizmovo-product-card__trust">Ships in 24h • COD Available</p>
             </div>
           </article>
 
           <!-- Product Card 02 -->
           <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-2">
             <div class="gizmovo-product-card__media">
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--primary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — FRONT]</span>
+              </div>
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--secondary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — ALT]</span>
+              </div>
               <span class="gizmovo-product-card__badge gizmovo-product-card__badge--alt">Selling Fast</span>
-              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
               <span class="gizmovo-product-card__index">02</span>
             </div>
             <div class="gizmovo-product-card__info">
@@ -239,18 +1608,29 @@
                 <s class="gizmovo-product-card__price-old">₹4,499</s>
                 <span class="gizmovo-product-card__price">₹2,299</span>
               </div>
-              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-2">
+              <div class="gizmovo-swatches" data-testid="swatches-2">
+                <button class="gizmovo-swatch gizmovo-swatch--black gizmovo-swatch--active" data-swatch data-variant="Matte Black" aria-label="Matte Black" data-testid="swatch-2-black"></button>
+                <button class="gizmovo-swatch gizmovo-swatch--titanium" data-swatch data-variant="Titanium" aria-label="Titanium" data-testid="swatch-2-titanium"></button>
+                <span class="gizmovo-swatches__label" data-swatch-label>Matte Black</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-name="[PRODUCT NAME] 02" data-price="2299" data-testid="add-to-cart-2">
                 <span class="gizmovo-btn__label">Add to Cart</span>
                 <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
               </button>
+              <p class="gizmovo-product-card__trust">Ships in 24h • COD Available</p>
             </div>
           </article>
 
           <!-- Product Card 03 -->
           <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-3">
             <div class="gizmovo-product-card__media">
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--primary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — FRONT]</span>
+              </div>
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--secondary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — ALT]</span>
+              </div>
               <span class="gizmovo-product-card__badge">TikTok Viral</span>
-              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
               <span class="gizmovo-product-card__index">03</span>
             </div>
             <div class="gizmovo-product-card__info">
@@ -259,18 +1639,30 @@
                 <s class="gizmovo-product-card__price-old">₹1,999</s>
                 <span class="gizmovo-product-card__price">₹999</span>
               </div>
-              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-3">
+              <div class="gizmovo-swatches" data-testid="swatches-3">
+                <button class="gizmovo-swatch gizmovo-swatch--black gizmovo-swatch--active" data-swatch data-variant="Matte Black" aria-label="Matte Black" data-testid="swatch-3-black"></button>
+                <button class="gizmovo-swatch gizmovo-swatch--titanium" data-swatch data-variant="Titanium" aria-label="Titanium" data-testid="swatch-3-titanium"></button>
+                <button class="gizmovo-swatch gizmovo-swatch--cobalt" data-swatch data-variant="Cobalt" aria-label="Cobalt" data-testid="swatch-3-cobalt"></button>
+                <span class="gizmovo-swatches__label" data-swatch-label>Matte Black</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-name="[PRODUCT NAME] 03" data-price="999" data-testid="add-to-cart-3">
                 <span class="gizmovo-btn__label">Add to Cart</span>
                 <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
               </button>
+              <p class="gizmovo-product-card__trust">Ships in 24h • COD Available</p>
             </div>
           </article>
 
           <!-- Product Card 04 -->
           <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-4">
             <div class="gizmovo-product-card__media">
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--primary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — FRONT]</span>
+              </div>
+              <div class="gizmovo-product-card__img gizmovo-product-card__img--secondary">
+                <span class="gizmovo-product-card__placeholder">[PRODUCT IMAGE — ALT]</span>
+              </div>
               <span class="gizmovo-product-card__badge gizmovo-product-card__badge--alt">Selling Fast</span>
-              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
               <span class="gizmovo-product-card__index">04</span>
             </div>
             <div class="gizmovo-product-card__info">
@@ -279,10 +1671,16 @@
                 <s class="gizmovo-product-card__price-old">₹5,999</s>
                 <span class="gizmovo-product-card__price">₹3,499</span>
               </div>
-              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-4">
+              <div class="gizmovo-swatches" data-testid="swatches-4">
+                <button class="gizmovo-swatch gizmovo-swatch--black gizmovo-swatch--active" data-swatch data-variant="Matte Black" aria-label="Matte Black" data-testid="swatch-4-black"></button>
+                <button class="gizmovo-swatch gizmovo-swatch--titanium" data-swatch data-variant="Titanium" aria-label="Titanium" data-testid="swatch-4-titanium"></button>
+                <span class="gizmovo-swatches__label" data-swatch-label>Matte Black</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-name="[PRODUCT NAME] 04" data-price="3499" data-testid="add-to-cart-4">
                 <span class="gizmovo-btn__label">Add to Cart</span>
                 <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
               </button>
+              <p class="gizmovo-product-card__trust">Ships in 24h • COD Available</p>
             </div>
           </article>
 
@@ -331,7 +1729,8 @@
     </section>
 
     <!-- ============================================================
-         Minimalist Footer (newsletter + legal + payments)
+         Minimalist Footer (newsletter + accordion link columns + payments)
+         Shopify Liquid: sections/footer.liquid
          ============================================================ -->
     <footer class="gizmovo-footer" id="footer" data-testid="site-footer">
       <div class="gizmovo-footer__inner">
@@ -349,15 +1748,52 @@
           <p class="gizmovo-newsletter__message" id="gizmovo-newsletter-message" role="status" data-testid="newsletter-message"></p>
         </div>
 
-        <!-- Footer links + payments -->
+        <!-- Footer link columns — native <details>/<summary> accordions on mobile -->
+        <div class="gizmovo-footer__cols">
+
+          <details class="gizmovo-footer-accordion" data-footer-accordion open data-testid="footer-accordion-shop">
+            <summary class="gizmovo-footer-accordion__summary">
+              Shop
+              <svg class="gizmovo-footer-accordion__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="gizmovo-footer-accordion__list">
+              <a href="#trending" class="gizmovo-footer__link">Trending Drops</a>
+              <a href="#" class="gizmovo-footer__link">Tech Essentials</a>
+              <a href="#" class="gizmovo-footer__link">New Arrivals</a>
+              <a href="#" class="gizmovo-footer__link">Gift Cards</a>
+            </div>
+          </details>
+
+          <details class="gizmovo-footer-accordion" data-footer-accordion open data-testid="footer-accordion-support">
+            <summary class="gizmovo-footer-accordion__summary">
+              Support
+              <svg class="gizmovo-footer-accordion__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="gizmovo-footer-accordion__list">
+              <a href="#" class="gizmovo-footer__link">Track Order</a>
+              <a href="#" class="gizmovo-footer__link" data-testid="footer-shipping">Domestic Shipping Policy</a>
+              <a href="#" class="gizmovo-footer__link" data-testid="footer-refunds">Refunds &amp; Returns</a>
+              <a href="#" class="gizmovo-footer__link">Contact Us</a>
+            </div>
+          </details>
+
+          <details class="gizmovo-footer-accordion" data-footer-accordion open data-testid="footer-accordion-legal">
+            <summary class="gizmovo-footer-accordion__summary">
+              Legal
+              <svg class="gizmovo-footer-accordion__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="gizmovo-footer-accordion__list">
+              <a href="#" class="gizmovo-footer__link" data-testid="footer-privacy">Privacy Policy</a>
+              <a href="#" class="gizmovo-footer__link" data-testid="footer-terms">Terms of Service</a>
+              <a href="#" class="gizmovo-footer__link">Cookie Policy</a>
+            </div>
+          </details>
+
+        </div>
+
+        <!-- Footer bottom: logo + payment icons -->
         <div class="gizmovo-footer__bottom">
           <span class="gizmovo-footer__logo">Gizmovo<span class="gizmovo-footer__logo-dot">.</span></span>
-          <nav class="gizmovo-footer__links" aria-label="Legal">
-            <a href="#" class="gizmovo-footer__link" data-testid="footer-privacy">Privacy Policy</a>
-            <a href="#" class="gizmovo-footer__link" data-testid="footer-terms">Terms of Service</a>
-            <a href="#" class="gizmovo-footer__link" data-testid="footer-shipping">Domestic Shipping Policy</a>
-            <a href="#" class="gizmovo-footer__link" data-testid="footer-refunds">Refunds</a>
-          </nav>
           <div class="gizmovo-footer__payments" aria-label="Accepted payment methods">
             <span class="gizmovo-footer__payment">VISA</span>
             <span class="gizmovo-footer__payment">Mastercard</span>
@@ -372,6 +1808,254 @@
 
   </main>
 
-  <script src="/main.js" defer></script>
+  <!-- ============================================================
+       Scripts (inlined — Shopify Liquid: extract to assets/gizmovo.js)
+       ============================================================ -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------- Hero on-load masked line reveal ---------- */
+      window.addEventListener('load', function () {
+        document.body.classList.add('gizmovo-loaded');
+      });
+      setTimeout(function () {
+        document.body.classList.add('gizmovo-loaded');
+      }, 400);
+
+      /* ---------- Scroll reveal (IntersectionObserver) ---------- */
+      var observed = document.querySelectorAll('.gizmovo-observe');
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('gizmovo-observe--visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+      observed.forEach(function (el) {
+        var siblings = Array.prototype.filter.call(
+          el.parentElement.children,
+          function (c) { return c.classList.contains('gizmovo-observe'); }
+        );
+        el.style.setProperty('--gz-stagger', (siblings.indexOf(el) * 0.09) + 's');
+        io.observe(el);
+      });
+
+      /* ---------- Header shadow on scroll ---------- */
+      var header = document.getElementById('gizmovo-header');
+      window.addEventListener('scroll', function () {
+        header.classList.toggle('gizmovo-header--scrolled', window.scrollY > 10);
+      }, { passive: true });
+
+      /* ---------- Subtle hero parallax ---------- */
+      var heroVisual = document.getElementById('gizmovo-hero-visual');
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () {
+          var y = window.scrollY;
+          if (y < window.innerHeight && document.body.classList.contains('gizmovo-loaded')) {
+            heroVisual.style.transform = 'translateY(' + (y * 0.12) + 'px)';
+          }
+          ticking = false;
+        });
+      }, { passive: true });
+
+      /* ============================================================
+         Drawer System (mobile menu + cart drawer + shared overlay)
+         ============================================================ */
+      var overlay = document.getElementById('gizmovo-overlay');
+      var menu = document.getElementById('gizmovo-menu');
+      var cartDrawer = document.getElementById('gizmovo-cart-drawer');
+      var menuOpenBtn = document.getElementById('gizmovo-menu-open');
+
+      function closeDrawers() {
+        menu.classList.remove('gizmovo-menu--open');
+        cartDrawer.classList.remove('gizmovo-cart-drawer--open');
+        overlay.classList.remove('gizmovo-overlay--visible');
+        document.body.classList.remove('gizmovo-no-scroll');
+        menuOpenBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      function openMenu() {
+        closeDrawers();
+        menu.classList.add('gizmovo-menu--open');
+        overlay.classList.add('gizmovo-overlay--visible');
+        document.body.classList.add('gizmovo-no-scroll');
+        menuOpenBtn.setAttribute('aria-expanded', 'true');
+      }
+
+      function openCart() {
+        closeDrawers();
+        cartDrawer.classList.add('gizmovo-cart-drawer--open');
+        overlay.classList.add('gizmovo-overlay--visible');
+        document.body.classList.add('gizmovo-no-scroll');
+      }
+
+      /* Mobile off-canvas menu triggers */
+      menuOpenBtn.addEventListener('click', openMenu);
+      document.getElementById('gizmovo-menu-close').addEventListener('click', closeDrawers);
+      document.querySelectorAll('[data-menu-link]').forEach(function (link) {
+        link.addEventListener('click', closeDrawers);
+      });
+
+      /* Cart drawer triggers */
+      document.getElementById('gizmovo-cart-btn').addEventListener('click', openCart);
+      document.getElementById('gizmovo-cart-close').addEventListener('click', closeDrawers);
+
+      /* Overlay click + Escape key close everything */
+      overlay.addEventListener('click', closeDrawers);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDrawers();
+      });
+
+      /* ============================================================
+         Cart State & Rendering
+         Shopify Liquid note: replace with Cart AJAX API (/cart/add.js)
+         ============================================================ */
+      var FREE_SHIPPING_THRESHOLD = 1999; /* ₹ — free express shipping goal */
+      var cart = []; /* [{ name, variant, price, qty }] */
+      var cartDot = document.getElementById('gizmovo-cart-dot');
+      var cartItemsEl = document.getElementById('gizmovo-cart-items');
+      var cartSubtotalEl = document.getElementById('gizmovo-cart-subtotal');
+      var cartCountEl = document.getElementById('gizmovo-cart-drawer-count');
+      var shippingTextEl = document.getElementById('gizmovo-shipping-text');
+      var shippingFillEl = document.getElementById('gizmovo-shipping-fill');
+
+      function formatINR(n) {
+        return '₹' + n.toLocaleString('en-IN');
+      }
+
+      function cartTotals() {
+        var count = 0, subtotal = 0;
+        cart.forEach(function (item) {
+          count += item.qty;
+          subtotal += item.price * item.qty;
+        });
+        return { count: count, subtotal: subtotal };
+      }
+
+      function popCartDot(count) {
+        cartDot.textContent = count;
+        cartDot.classList.toggle('gizmovo-header__cart-dot--visible', count > 0);
+        cartDot.classList.remove('gizmovo-header__cart-dot--pop');
+        void cartDot.offsetWidth; /* reflow to restart pop animation */
+        if (count > 0) cartDot.classList.add('gizmovo-header__cart-dot--pop');
+      }
+
+      function renderCart() {
+        var totals = cartTotals();
+
+        /* Dot + drawer count + subtotal */
+        popCartDot(totals.count);
+        cartCountEl.textContent = '(' + totals.count + ')';
+        cartSubtotalEl.textContent = formatINR(totals.subtotal);
+
+        /* Free shipping progress */
+        var pct = Math.min(100, Math.round((totals.subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+        shippingFillEl.style.width = pct + '%';
+        if (totals.subtotal <= 0) {
+          shippingTextEl.innerHTML = 'Add items to unlock <strong>Free Express Shipping</strong>';
+        } else if (totals.subtotal >= FREE_SHIPPING_THRESHOLD) {
+          shippingTextEl.innerHTML = '🎉 You’ve unlocked <strong>Free Express Shipping</strong>!';
+        } else {
+          shippingTextEl.innerHTML = 'You’re <strong>' + formatINR(FREE_SHIPPING_THRESHOLD - totals.subtotal) + '</strong> away from <strong>Free Express Shipping</strong>';
+        }
+
+        /* Line items */
+        if (cart.length === 0) {
+          cartItemsEl.innerHTML = '<p class="gizmovo-cart-drawer__empty" data-testid="cart-empty-message">Your cart is empty.<br />Go grab the drop before it\'s gone. 👀</p>';
+          return;
+        }
+        cartItemsEl.innerHTML = '';
+        cart.forEach(function (item, idx) {
+          var row = document.createElement('div');
+          row.className = 'gizmovo-cart-item';
+          row.setAttribute('data-testid', 'cart-item-' + (idx + 1));
+          row.innerHTML =
+            '<div class="gizmovo-cart-item__thumb">IMG</div>' +
+            '<div class="gizmovo-cart-item__info">' +
+              '<p class="gizmovo-cart-item__name">' + item.name + '</p>' +
+              '<p class="gizmovo-cart-item__meta">' + item.variant + ' · Qty ' + item.qty + '</p>' +
+            '</div>' +
+            '<span class="gizmovo-cart-item__price">' + formatINR(item.price * item.qty) + '</span>' +
+            '<button class="gizmovo-cart-item__remove" aria-label="Remove item" data-testid="cart-item-remove-' + (idx + 1) + '">×</button>';
+          row.querySelector('.gizmovo-cart-item__remove').addEventListener('click', function () {
+            cart.splice(idx, 1);
+            renderCart();
+          });
+          cartItemsEl.appendChild(row);
+        });
+      }
+
+      /* ---------- Add to Cart buttons ---------- */
+      document.querySelectorAll('[data-add-to-cart]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var card = btn.closest('.gizmovo-product-card');
+          var activeSwatch = card ? card.querySelector('.gizmovo-swatch--active') : null;
+          var variant = activeSwatch ? activeSwatch.getAttribute('data-variant') : 'Default';
+          var name = btn.getAttribute('data-name');
+          var price = parseInt(btn.getAttribute('data-price'), 10);
+
+          /* Merge identical name+variant lines */
+          var existing = cart.find(function (i) { return i.name === name && i.variant === variant; });
+          if (existing) { existing.qty += 1; } else { cart.push({ name: name, variant: variant, price: price, qty: 1 }); }
+
+          renderCart();
+
+          /* Button "Added ✓" swap, then open the cart drawer */
+          btn.classList.add('gizmovo-btn--clicked');
+          setTimeout(function () { btn.classList.remove('gizmovo-btn--clicked'); }, 1400);
+          setTimeout(openCart, 450);
+        });
+      });
+
+      /* ---------- Variant swatches (active ring per card) ---------- */
+      document.querySelectorAll('.gizmovo-swatches').forEach(function (group) {
+        var label = group.querySelector('[data-swatch-label]');
+        group.querySelectorAll('[data-swatch]').forEach(function (swatch) {
+          swatch.addEventListener('click', function () {
+            group.querySelectorAll('[data-swatch]').forEach(function (s) {
+              s.classList.remove('gizmovo-swatch--active');
+            });
+            swatch.classList.add('gizmovo-swatch--active');
+            if (label) label.textContent = swatch.getAttribute('data-variant');
+          });
+        });
+      });
+
+      /* ---------- Footer accordions: open on desktop, collapsed on mobile ---------- */
+      var mobileQuery = window.matchMedia('(max-width: 768px)');
+      function syncFooterAccordions(isMobile) {
+        document.querySelectorAll('[data-footer-accordion]').forEach(function (d) {
+          d.open = !isMobile;
+        });
+      }
+      syncFooterAccordions(mobileQuery.matches);
+      mobileQuery.addEventListener('change', function (e) { syncFooterAccordions(e.matches); });
+
+      /* ---------- Newsletter form (client-side validation) ---------- */
+      var form = document.getElementById('gizmovo-newsletter-form');
+      var emailInput = document.getElementById('gizmovo-newsletter-email');
+      var message = document.getElementById('gizmovo-newsletter-message');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var value = emailInput.value.trim();
+        var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        if (!valid) {
+          message.textContent = 'Please enter a valid email address.';
+          message.classList.add('gizmovo-newsletter__message--error');
+          return;
+        }
+        message.classList.remove('gizmovo-newsletter__message--error');
+        message.textContent = 'You’re in! Check your inbox for the 10% code. 🎉';
+        emailInput.value = '';
+      });
+    })();
+  </script>
 </body>
 </html>
