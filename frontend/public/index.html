@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Gizmovo — Curated, viral gadgets shipped directly to your door. Tech that just makes sense." />
+  <title>Gizmovo — Tech That Just Makes Sense.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       Sticky Announcement Bar (infinite CSS marquee)
+       ============================================================ -->
+  <div class="gizmovo-announcement" data-testid="announcement-bar">
+    <div class="gizmovo-announcement__track" aria-hidden="false">
+      <div class="gizmovo-announcement__group">
+        <span class="gizmovo-announcement__item">Free &amp; Fast Domestic Shipping Across India 🇮🇳</span>
+        <span class="gizmovo-announcement__dot"></span>
+        <span class="gizmovo-announcement__item">Cash on Delivery Available</span>
+        <span class="gizmovo-announcement__dot"></span>
+        <span class="gizmovo-announcement__item">Free &amp; Fast Domestic Shipping Across India 🇮🇳</span>
+        <span class="gizmovo-announcement__dot"></span>
+        <span class="gizmovo-announcement__item">Cash on Delivery Available</span>
+        <span class="gizmovo-announcement__dot"></span>
+      </div>
+      <div class="gizmovo-announcement__group" aria-hidden="true">
+        <span class="gizmovo-announcement__item">Free &amp; Fast Domestic Shipping Across India 🇮🇳</span>
+        <span class="gizmovo-announcement__dot"></span>
+        <span class="gizmovo-announcement__item">Cash on Delivery Available</span>
+        <span class="gizmovo-announcement__dot"></span>
+        <span class="gizmovo-announcement__item">Free &amp; Fast Domestic Shipping Across India 🇮🇳</span>
+        <span class="gizmovo-announcement__dot"></span>
+        <span class="gizmovo-announcement__item">Cash on Delivery Available</span>
+        <span class="gizmovo-announcement__dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Header / Navigation
+       ============================================================ -->
+  <header class="gizmovo-header" id="gizmovo-header" data-testid="site-header">
+    <div class="gizmovo-header__inner">
+      <a href="#" class="gizmovo-header__logo" data-testid="logo-link">Gizmovo<span class="gizmovo-header__logo-dot">.</span></a>
+
+      <nav class="gizmovo-header__nav" aria-label="Primary">
+        <a href="#trending" class="gizmovo-header__link" data-testid="nav-trending">Trending</a>
+        <a href="#manifesto" class="gizmovo-header__link" data-testid="nav-essentials">Tech Essentials</a>
+        <a href="#footer" class="gizmovo-header__link" data-testid="nav-track-order">Track Order</a>
+      </nav>
+
+      <div class="gizmovo-header__actions">
+        <button class="gizmovo-header__icon-btn" aria-label="Search" data-testid="search-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <button class="gizmovo-header__icon-btn gizmovo-header__icon-btn--cart" aria-label="Cart" id="gizmovo-cart-btn" data-testid="cart-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 8.5a2 2 0 0 1-2 1.5H8.7a2 2 0 0 1-2-1.6L5 3H2"/><circle cx="9" cy="21" r="1.6"/><circle cx="18" cy="21" r="1.6"/></svg>
+          <span class="gizmovo-header__cart-dot" id="gizmovo-cart-dot" data-testid="cart-dot">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="gizmovo-main">
+
+    <!-- ============================================================
+         High-Impact Hero Section (kinetic masked-line reveal)
+         ============================================================ -->
+    <section class="gizmovo-hero" id="hero" data-testid="hero-section">
+      <div class="gizmovo-hero__grid-bg" aria-hidden="true"></div>
+      <div class="gizmovo-hero__inner">
+        <div class="gizmovo-hero__content">
+          <p class="gizmovo-hero__eyebrow gizmovo-reveal-line"><span class="gizmovo-reveal-line__inner">New drop · June ‘26 · Chapter 04</span></p>
+          <h1 class="gizmovo-hero__headline" data-testid="hero-headline">
+            <span class="gizmovo-reveal-line"><span class="gizmovo-reveal-line__inner">Tech That</span></span>
+            <span class="gizmovo-reveal-line"><span class="gizmovo-reveal-line__inner">Just Makes</span></span>
+            <span class="gizmovo-reveal-line gizmovo-reveal-line--accent"><span class="gizmovo-reveal-line__inner">Sense<span class="gizmovo-hero__period">.</span></span></span>
+          </h1>
+          <p class="gizmovo-hero__subhead gizmovo-reveal-line"><span class="gizmovo-reveal-line__inner">Curated, viral gadgets shipped directly to your door.</span></p>
+          <div class="gizmovo-hero__cta-row gizmovo-reveal-line">
+            <span class="gizmovo-reveal-line__inner">
+              <a href="#trending" class="gizmovo-btn gizmovo-btn--primary" data-testid="hero-cta">
+                <span class="gizmovo-btn__label">Shop the Drop</span>
+                <span class="gizmovo-btn__arrow" aria-hidden="true">→</span>
+              </a>
+              <span class="gizmovo-hero__cta-note">Ships in 24h · COD available</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Hero product visual (parallax placeholder frame) -->
+        <div class="gizmovo-hero__visual" id="gizmovo-hero-visual" data-testid="hero-visual">
+          <div class="gizmovo-hero__frame">
+            <span class="gizmovo-hero__frame-tag">FW/26</span>
+            <span class="gizmovo-hero__frame-label">[HERO GADGET PLACEHOLDER]</span>
+            <span class="gizmovo-hero__frame-meta">1200 × 1200 · high-res product shot</span>
+          </div>
+          <div class="gizmovo-hero__chip gizmovo-hero__chip--one">★ 4.9 / 2.3k reviews</div>
+          <div class="gizmovo-hero__chip gizmovo-hero__chip--two">🔥 Restocked today</div>
+        </div>
+      </div>
+
+      <div class="gizmovo-hero__scroll-hint" aria-hidden="true">
+        <span class="gizmovo-hero__scroll-line"></span>
+        <span>Scroll</span>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Trust Bar
+         ============================================================ -->
+    <section class="gizmovo-trust" data-testid="trust-bar">
+      <div class="gizmovo-trust__inner">
+        <div class="gizmovo-trust__item gizmovo-observe" data-testid="trust-item-delivery">
+          <span class="gizmovo-trust__icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11L9 22l8.5-11.5H12L13 2z"/></svg>
+          </span>
+          <span class="gizmovo-trust__text">Lightning Fast Domestic Delivery</span>
+        </div>
+        <div class="gizmovo-trust__item gizmovo-observe" data-testid="trust-item-quality">
+          <span class="gizmovo-trust__icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.6 5.6L20.5 9l-4.2 4.2 1 6L12 16.4 6.7 19.2l1-6L3.5 9l5.9-1.4L12 2z"/></svg>
+          </span>
+          <span class="gizmovo-trust__text">Premium Quality</span>
+        </div>
+        <div class="gizmovo-trust__item gizmovo-observe" data-testid="trust-item-secure">
+          <span class="gizmovo-trust__icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3.5v5c0 5-3.4 9.6-8 11-4.6-1.4-8-6-8-11v-5L12 2z"/><path d="M8.5 11.8l2.3 2.4 4.7-5"/></svg>
+          </span>
+          <span class="gizmovo-trust__text">Secure Checkout</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Manifesto (numbered editorial chapters)
+         ============================================================ -->
+    <section class="gizmovo-manifesto" id="manifesto" data-testid="manifesto-section">
+      <div class="gizmovo-manifesto__inner">
+        <p class="gizmovo-manifesto__kicker gizmovo-observe">The Gizmovo way</p>
+        <article class="gizmovo-manifesto__chapter gizmovo-observe" data-testid="manifesto-chapter-1">
+          <span class="gizmovo-manifesto__num">01</span>
+          <div class="gizmovo-manifesto__body">
+            <h2 class="gizmovo-manifesto__title">No gadget graveyards.</h2>
+            <p class="gizmovo-manifesto__text">We test every viral product before it hits the store. If it doesn’t survive two weeks of daily abuse, it doesn’t ship.</p>
+          </div>
+        </article>
+        <article class="gizmovo-manifesto__chapter gizmovo-observe" data-testid="manifesto-chapter-2">
+          <span class="gizmovo-manifesto__num">02</span>
+          <div class="gizmovo-manifesto__body">
+            <h2 class="gizmovo-manifesto__title">Speed is the feature.</h2>
+            <p class="gizmovo-manifesto__text">Domestic warehouses, 24-hour dispatch, live tracking. Your drop moves as fast as your feed does.</p>
+          </div>
+        </article>
+        <article class="gizmovo-manifesto__chapter gizmovo-observe" data-testid="manifesto-chapter-3">
+          <span class="gizmovo-manifesto__num">03</span>
+          <div class="gizmovo-manifesto__body">
+            <h2 class="gizmovo-manifesto__title">Priced like a friend.</h2>
+            <p class="gizmovo-manifesto__text">Straight-from-source curation. No middlemen mark-ups, no fake MRP games — just honest tech at honest prices.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Editorial Marquee (slow, oversized)
+         ============================================================ -->
+    <section class="gizmovo-marquee" aria-hidden="true" data-testid="editorial-marquee">
+      <div class="gizmovo-marquee__track">
+        <div class="gizmovo-marquee__group">
+          <span class="gizmovo-marquee__word">Trending Drops</span>
+          <span class="gizmovo-marquee__star">✦</span>
+          <span class="gizmovo-marquee__word gizmovo-marquee__word--outline">Curated Weekly</span>
+          <span class="gizmovo-marquee__star">✦</span>
+          <span class="gizmovo-marquee__word">Trending Drops</span>
+          <span class="gizmovo-marquee__star">✦</span>
+          <span class="gizmovo-marquee__word gizmovo-marquee__word--outline">Curated Weekly</span>
+          <span class="gizmovo-marquee__star">✦</span>
+        </div>
+        <div class="gizmovo-marquee__group">
+          <span class="gizmovo-marquee__word">Trending Drops</span>
+          <span class="gizmovo-marquee__star">✦</span>
+          <span class="gizmovo-marquee__word gizmovo-marquee__word--outline">Curated Weekly</span>
+          <span class="gizmovo-marquee__star">✦</span>
+          <span class="gizmovo-marquee__word">Trending Drops</span>
+          <span class="gizmovo-marquee__star">✦</span>
+          <span class="gizmovo-marquee__word gizmovo-marquee__word--outline">Curated Weekly</span>
+          <span class="gizmovo-marquee__star">✦</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         "Trending Drops" Product Grid
+         ============================================================ -->
+    <section class="gizmovo-products" id="trending" data-testid="products-section">
+      <div class="gizmovo-products__inner">
+        <div class="gizmovo-products__head gizmovo-observe">
+          <h2 class="gizmovo-products__title">Trending<br />Drops<span class="gizmovo-products__title-dot">.</span></h2>
+          <p class="gizmovo-products__sub">Four pieces the internet won’t shut up about. Restocked weekly, gone in days.</p>
+        </div>
+
+        <div class="gizmovo-products__grid">
+
+          <!-- Product Card 01 -->
+          <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-1">
+            <div class="gizmovo-product-card__media">
+              <span class="gizmovo-product-card__badge">TikTok Viral</span>
+              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
+              <span class="gizmovo-product-card__index">01</span>
+            </div>
+            <div class="gizmovo-product-card__info">
+              <h3 class="gizmovo-product-card__title">[PRODUCT NAME]</h3>
+              <div class="gizmovo-product-card__pricing">
+                <s class="gizmovo-product-card__price-old">₹2,999</s>
+                <span class="gizmovo-product-card__price">₹1,499</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-1">
+                <span class="gizmovo-btn__label">Add to Cart</span>
+                <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Card 02 -->
+          <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-2">
+            <div class="gizmovo-product-card__media">
+              <span class="gizmovo-product-card__badge gizmovo-product-card__badge--alt">Selling Fast</span>
+              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
+              <span class="gizmovo-product-card__index">02</span>
+            </div>
+            <div class="gizmovo-product-card__info">
+              <h3 class="gizmovo-product-card__title">[PRODUCT NAME]</h3>
+              <div class="gizmovo-product-card__pricing">
+                <s class="gizmovo-product-card__price-old">₹4,499</s>
+                <span class="gizmovo-product-card__price">₹2,299</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-2">
+                <span class="gizmovo-btn__label">Add to Cart</span>
+                <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Card 03 -->
+          <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-3">
+            <div class="gizmovo-product-card__media">
+              <span class="gizmovo-product-card__badge">TikTok Viral</span>
+              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
+              <span class="gizmovo-product-card__index">03</span>
+            </div>
+            <div class="gizmovo-product-card__info">
+              <h3 class="gizmovo-product-card__title">[PRODUCT NAME]</h3>
+              <div class="gizmovo-product-card__pricing">
+                <s class="gizmovo-product-card__price-old">₹1,999</s>
+                <span class="gizmovo-product-card__price">₹999</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-3">
+                <span class="gizmovo-btn__label">Add to Cart</span>
+                <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Card 04 -->
+          <article class="gizmovo-product-card gizmovo-observe" data-testid="product-card-4">
+            <div class="gizmovo-product-card__media">
+              <span class="gizmovo-product-card__badge gizmovo-product-card__badge--alt">Selling Fast</span>
+              <span class="gizmovo-product-card__placeholder">[PRODUCT NAME]</span>
+              <span class="gizmovo-product-card__index">04</span>
+            </div>
+            <div class="gizmovo-product-card__info">
+              <h3 class="gizmovo-product-card__title">[PRODUCT NAME]</h3>
+              <div class="gizmovo-product-card__pricing">
+                <s class="gizmovo-product-card__price-old">₹5,999</s>
+                <span class="gizmovo-product-card__price">₹3,499</span>
+              </div>
+              <button class="gizmovo-btn gizmovo-btn--cart" data-add-to-cart data-testid="add-to-cart-4">
+                <span class="gizmovo-btn__label">Add to Cart</span>
+                <span class="gizmovo-btn__label gizmovo-btn__label--added">Added ✓</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Social Proof / UGC Section (horizontal scroll row)
+         ============================================================ -->
+    <section class="gizmovo-ugc" data-testid="ugc-section">
+      <div class="gizmovo-ugc__inner">
+        <div class="gizmovo-ugc__head gizmovo-observe">
+          <h2 class="gizmovo-ugc__title">The internet<br />approves<span class="gizmovo-ugc__title-dot">.</span></h2>
+          <p class="gizmovo-ugc__sub">Real comments from real feeds. Zero filters, all hype.</p>
+        </div>
+
+        <div class="gizmovo-ugc__row" data-testid="ugc-scroll-row">
+          <figure class="gizmovo-review-card gizmovo-observe" data-testid="review-card-1">
+            <span class="gizmovo-review-card__stars" aria-label="5 out of 5 stars">★★★★★</span>
+            <blockquote class="gizmovo-review-card__quote">“Ordered Monday, unboxed Wednesday. This is the fastest tech drop I’ve ever copped.”</blockquote>
+            <figcaption class="gizmovo-review-card__user">@aarav.builds</figcaption>
+          </figure>
+          <figure class="gizmovo-review-card gizmovo-observe" data-testid="review-card-2">
+            <span class="gizmovo-review-card__stars" aria-label="5 out of 5 stars">★★★★★</span>
+            <blockquote class="gizmovo-review-card__quote">“Saw it on my FYP, bought it at 2am, zero regrets. Quality is actually insane.”</blockquote>
+            <figcaption class="gizmovo-review-card__user">@nehascrolls</figcaption>
+          </figure>
+          <figure class="gizmovo-review-card gizmovo-observe" data-testid="review-card-3">
+            <span class="gizmovo-review-card__stars" aria-label="5 out of 5 stars">★★★★★</span>
+            <blockquote class="gizmovo-review-card__quote">“COD + free shipping + this build quality? Gizmovo is doing something illegal fr.”</blockquote>
+            <figcaption class="gizmovo-review-card__user">@techwithtanmay</figcaption>
+          </figure>
+          <figure class="gizmovo-review-card gizmovo-observe" data-testid="review-card-4">
+            <span class="gizmovo-review-card__stars" aria-label="5 out of 5 stars">★★★★★</span>
+            <blockquote class="gizmovo-review-card__quote">“My third order this month. The packaging alone deserves a design award.”</blockquote>
+            <figcaption class="gizmovo-review-card__user">@riaunboxes</figcaption>
+          </figure>
+          <figure class="gizmovo-review-card gizmovo-observe" data-testid="review-card-5">
+            <span class="gizmovo-review-card__stars" aria-label="5 out of 5 stars">★★★★★</span>
+            <blockquote class="gizmovo-review-card__quote">“Gifted one to my brother, kept one for myself. That’s the review.”</blockquote>
+            <figcaption class="gizmovo-review-card__user">@whatkabirbought</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Minimalist Footer (newsletter + legal + payments)
+         ============================================================ -->
+    <footer class="gizmovo-footer" id="footer" data-testid="site-footer">
+      <div class="gizmovo-footer__inner">
+
+        <!-- Newsletter signup block -->
+        <div class="gizmovo-footer__newsletter gizmovo-observe">
+          <h2 class="gizmovo-footer__headline">Don’t miss<br />the next drop<span class="gizmovo-footer__headline-dot">.</span></h2>
+          <p class="gizmovo-footer__sub">Get 10% off your first order.</p>
+          <form class="gizmovo-newsletter" id="gizmovo-newsletter-form" data-testid="newsletter-form" novalidate>
+            <input type="email" class="gizmovo-newsletter__input" id="gizmovo-newsletter-email" placeholder="your@email.com" required aria-label="Email address" data-testid="newsletter-input" />
+            <button type="submit" class="gizmovo-btn gizmovo-btn--primary gizmovo-newsletter__submit" data-testid="newsletter-submit">
+              <span class="gizmovo-btn__label">Get 10% Off</span>
+            </button>
+          </form>
+          <p class="gizmovo-newsletter__message" id="gizmovo-newsletter-message" role="status" data-testid="newsletter-message"></p>
+        </div>
+
+        <!-- Footer links + payments -->
+        <div class="gizmovo-footer__bottom">
+          <span class="gizmovo-footer__logo">Gizmovo<span class="gizmovo-footer__logo-dot">.</span></span>
+          <nav class="gizmovo-footer__links" aria-label="Legal">
+            <a href="#" class="gizmovo-footer__link" data-testid="footer-privacy">Privacy Policy</a>
+            <a href="#" class="gizmovo-footer__link" data-testid="footer-terms">Terms of Service</a>
+            <a href="#" class="gizmovo-footer__link" data-testid="footer-shipping">Domestic Shipping Policy</a>
+            <a href="#" class="gizmovo-footer__link" data-testid="footer-refunds">Refunds</a>
+          </nav>
+          <div class="gizmovo-footer__payments" aria-label="Accepted payment methods">
+            <span class="gizmovo-footer__payment">VISA</span>
+            <span class="gizmovo-footer__payment">Mastercard</span>
+            <span class="gizmovo-footer__payment">UPI</span>
+            <span class="gizmovo-footer__payment">COD</span>
+          </div>
+        </div>
+
+        <p class="gizmovo-footer__copyright">© 2026 Gizmovo. Made for the feed generation.</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="/main.js" defer></script>
+</body>
+</html>
